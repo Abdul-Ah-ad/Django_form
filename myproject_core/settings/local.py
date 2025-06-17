@@ -4,7 +4,6 @@ Rename to local.py and update as needed.
 """
 
 
-
 DEBUG = True
 
 SECRET_KEY = 'your-local-dev-secret-key'
@@ -21,6 +20,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

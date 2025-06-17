@@ -21,6 +21,7 @@ DATABASES = {
     }
 }
 
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Optional for API testing
