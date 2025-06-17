@@ -59,4 +59,4 @@ node_modules/
 *.bak
 *.tmp
 *.old
-myproject_ciore/settings/local.py
+myproject_core/settings/local.py
