@@ -9,7 +9,7 @@ source venv/bin/activate  # Linux/macOS
 # OR
 venv\Scripts\activate     # Windows
 
-2-pip install -r requirements.txt (working onit)
+2-pip install -r requirements.txt 
 
 3-python manage.py runserver
 
