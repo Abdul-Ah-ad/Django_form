@@ -8,7 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 def signup_view(request):
     try:
         if request.method == 'POST':
-            form = SignupForm(request.POST)
+            form = SignupForm(request.POST, request.FILES)
             if form.is_valid():
                 user = form.save()
                 login(request, user)
@@ -46,15 +46,21 @@ def profile_view(request):
 @login_required
 def edit_profile_view(request):
     try:
+        profile = request.user.profile  # Ensure related_name='profile' exists or default
+
         if request.method == 'POST':
-            form = EditProfileForm(request.POST, instance=request.user)
+            form = EditProfileForm(request.POST, request.FILES, instance=request.user)
             if form.is_valid():
-                form.save()
+                user = form.save()
+                profile.bio = request.POST.get('bio', profile.bio)
+                if 'profile_picture' in request.FILES:
+                    profile.profile_picture = request.FILES['profile_picture']
+                profile.save()
                 messages.success(request, 'Profile updated successfully.')
                 return redirect('profile')
         else:
             form = EditProfileForm(instance=request.user)
-        return render(request, 'accounts/edit_profile.html', {'form': form})
+        return render(request, 'accounts/edit_profile.html', {'form': form, 'profile': profile})
     except Exception as e:
         messages.error(request, f"Error updating profile: {e}")
         return redirect('edit_profile')
