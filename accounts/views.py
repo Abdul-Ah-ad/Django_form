@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignupForm, EditProfileForm
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages  
 
 def signup_view(request):
     try:
@@ -12,13 +13,17 @@ def signup_view(request):
             if form.is_valid():
                 user = form.save()
                 login(request, user)
+                messages.success(request, "Account created successfully!")  # ✅ Added success message
                 return redirect('profile')
+            else:
+                messages.error(request, "Please fix the errors below.")  # ✅ Inform user if form invalid
         else:
             form = SignupForm()
         return render(request, 'accounts/signup.html', {'form': form})
     except Exception as e:
         messages.error(request, f"Signup error: {e}")
         return redirect('signup')
+
 
 def login_view(request):
     try:
@@ -46,21 +51,24 @@ def profile_view(request):
 @login_required
 def edit_profile_view(request):
     try:
-        profile = request.user.profile  # Ensure related_name='profile' exists or default
+        user = request.user
+        profile = user.profile
 
         if request.method == 'POST':
-            form = EditProfileForm(request.POST, request.FILES, instance=request.user)
+            form = EditProfileForm(request.POST, request.FILES, instance=user, profile=profile)
             if form.is_valid():
-                user = form.save()
-                profile.bio = request.POST.get('bio', profile.bio)
-                if 'profile_picture' in request.FILES:
-                    profile.profile_picture = request.FILES['profile_picture']
-                profile.save()
+                form.save(user, profile)  # ✅ Use the new save method that handles both
                 messages.success(request, 'Profile updated successfully.')
                 return redirect('profile')
         else:
-            form = EditProfileForm(instance=request.user)
-        return render(request, 'accounts/edit_profile.html', {'form': form, 'profile': profile})
+            form = EditProfileForm(instance=user, profile=profile)
+
+        return render(request, 'accounts/edit_profile.html', {
+            'form': form,
+            'profile': profile
+        })
     except Exception as e:
         messages.error(request, f"Error updating profile: {e}")
         return redirect('edit_profile')
+
+
